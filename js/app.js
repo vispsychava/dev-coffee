@@ -191,8 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('btn-ver-mas');
         btn.textContent = 'Ver más';
 
-        btn.addEventListener('click', () => {
-            abrirNuevaPestana(cafe);
+                btn.addEventListener('click', () => {
+            localStorage.setItem('cafeSeleccionado', JSON.stringify(cafe));
+            window.location.href = 'detalle.html';
         });
 
         cardContent.appendChild(title);
@@ -205,10 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedor.appendChild(card);
     });
 
-    // 4. FUNCIÓN QUE ABRE UNA NUEVA PESTAÑA
-    function abrirNuevaPestana(cafe) {
-        localStorage.setItem('cafeSeleccionado', JSON.stringify(cafe));
-        window.open('detalle.html', '_blank');
-    }
+    
 
 });
