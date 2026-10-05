@@ -121,6 +121,19 @@
         #vista-detalle.activa { display: block; }
         #vista-catalogo.oculta { display: none; }
 
+        /* Encabezado pequeño de la vista detalle */
+        .detalle-header {
+            max-width: 820px;
+            margin: 0 auto 20px auto;
+            padding: 0 4px;
+        }
+        .detalle-header h2 {
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
         @media (max-width: 600px) {
             .detalle-wrapper { padding: 24px; border-radius: 16px; }
             .fila-superior { flex-direction: column; align-items: flex-start; gap: 20px; }
@@ -133,25 +146,34 @@
 <body>
 
     <main>
-        <!-- BARRA DE NAVEGACIÓN -->
-        <nav>
-            <h1>COFFE PWA</h1>
-            <ul class="menu">
-                <li>Home</li>
-                <li>Acerca de</li>
-                <li>Blog</li>
-            </ul>
-        </nav>
 
         <!-- ================= VISTA CATÁLOGO ================= -->
         <section id="vista-catalogo">
+
+            <!-- BARRA DE NAVEGACIÓN (SOLO VISIBLE EN EL CATÁLOGO) -->
+            <nav>
+                <h1>COFFE PWA</h1>
+                <ul class="menu">
+                    <li>Home</li>
+                    <li>Acerca de</li>
+                    <li>Blog</li>
+                </ul>
+            </nav>
+
             <section id="contenedor-cafes" class="conteiner">
                 <!-- JavaScript insertará las cards aquí -->
             </section>
+
         </section>
 
         <!-- ================= VISTA DETALLE ================= -->
         <section id="vista-detalle">
+
+            <!-- Encabezado pequeño de la vista detalle -->
+            <div class="detalle-header">
+                <h2>☕ Detalle del producto</h2>
+            </div>
+
             <div class="detalle-wrapper">
                 <div class="fila-superior">
                     <div class="mitad-imagen">
@@ -186,7 +208,9 @@
 
                 <button id="btn-volver" class="btn-volver">← Volver al inicio</button>
             </div>
+
         </section>
+
     </main>
 
     <script src="js/app.js"></script>
