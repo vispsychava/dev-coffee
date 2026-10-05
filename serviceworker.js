@@ -1,9 +1,8 @@
-const CACHE_NAME = 'devcoffee-v3';  
+const CACHE_NAME = 'devcoffee-v4';  
 
 const ARCHIVOS = [
     './',
     './index.html',
-    './detalle.html',
     './manifest.json',
     './css/style.css',
     './js/app.js',
