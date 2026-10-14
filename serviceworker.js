@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devcoffee-v4';  
+const CACHE_NAME = 'devcoffee-v5';
 
 const ARCHIVOS = [
     './',
@@ -28,18 +28,25 @@ const ARCHIVOS = [
     './imagenes/coffe10.jpg'
 ];
 
+// INSTALACIÓN: precarga de recursos estáticos
 self.addEventListener('install', event => {
     console.log('[SW] Instalando Service Worker...');
+
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll(ARCHIVOS))
             .then(() => self.skipWaiting())
-            .catch(error => console.error('[SW] Error al guardar en caché:', error))
+            .catch(error => {
+                console.error('[SW] Error al guardar en caché:', error);
+                throw error;
+            })
     );
 });
 
+// ACTIVACIÓN: elimina las cachés antiguas
 self.addEventListener('activate', event => {
     console.log('[SW] Activando Service Worker...');
+
     event.waitUntil(
         caches.keys()
             .then(nombresCaches => {
@@ -56,29 +63,66 @@ self.addEventListener('activate', event => {
     );
 });
 
+// FETCH: estrategias Cache First y Network First
 self.addEventListener('fetch', event => {
-    if (event.request.method !== 'GET') return;
-    if (!event.request.url.startsWith('http')) return;
+    const solicitud = event.request;
 
+    // Solo interceptamos peticiones GET del mismo origen
+    if (solicitud.method !== 'GET') return;
+
+    const url = new URL(solicitud.url);
+
+    if (url.origin !== self.location.origin) return;
+
+    // NETWORK FIRST: páginas HTML
+    if (
+        solicitud.mode === 'navigate' ||
+        solicitud.destination === 'document'
+    ) {
+        event.respondWith(
+            fetch(solicitud)
+                .then(respuestaRed => {
+                    if (respuestaRed.ok) {
+                        const copia = respuestaRed.clone();
+
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.put(solicitud, copia));
+                    }
+
+                    return respuestaRed;
+                })
+                .catch(async () => {
+                    const respuestaCache = await caches.match(solicitud);
+
+                    if (respuestaCache) {
+                        return respuestaCache;
+                    }
+
+                    return caches.match('./index.html');
+                })
+        );
+
+        return;
+    }
+
+    // CACHE FIRST: CSS, JavaScript, imágenes y otros recursos
     event.respondWith(
-        caches.match(event.request)
+        caches.match(solicitud)
             .then(respuestaCache => {
-                if (respuestaCache) return respuestaCache;
+                if (respuestaCache) {
+                    return respuestaCache;
+                }
 
-                return fetch(event.request)
+                return fetch(solicitud)
                     .then(respuestaRed => {
-                        if (respuestaRed && respuestaRed.status === 200) {
+                        if (respuestaRed.ok) {
                             const copia = respuestaRed.clone();
-                            caches.open(CACHE_NAME).then(cache => {
-                                cache.put(event.request, copia);
-                            });
+
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.put(solicitud, copia));
                         }
+
                         return respuestaRed;
-                    })
-                    .catch(() => {
-                        if (event.request.mode === 'navigate') {
-                            return caches.match('./index.html');
-                        }
                     });
             })
     );
